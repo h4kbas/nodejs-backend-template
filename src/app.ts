@@ -1,7 +1,10 @@
 // this shim is required
-import { Action, createExpressServer } from "routing-controllers";
+import { Action, createExpressServer, getMetadataArgsStorage} from "routing-controllers";
+import { routingControllersToSpec } from 'routing-controllers-openapi'
+
 import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import swaggerUi from "swagger-ui-express";
 
 import controllers from "./controllers";
 import { User } from "./entities/User";
@@ -55,5 +58,10 @@ const app = createExpressServer({
     }),
   currentUserChecker: (action: Action) => action.request.user,
 });
+
+// Register Swagger UI with OpenAPI spec
+const storage = getMetadataArgsStorage()
+const spec = routingControllersToSpec(storage)
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
 
 export default app;
