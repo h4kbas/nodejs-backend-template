@@ -1,0 +1,31 @@
+# docker-compose.yml
+version: "3"
+services:
+  app:
+    restart: on-failure
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    volumes:
+      - .:/app/
+      - /app/node_modules
+
+  postgres:
+    image: postgres:11
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: soulmeet
+      POSTGRES_PASSWORD: soulmeet
+      POSTGRES_DB: soulmeet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U soulmeet"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
